@@ -19,10 +19,10 @@ test('Login', async ({ page }) => {
 
     await page.getByText('Clients').click();
     await expect(page.getByRole('heading', { name: 'Clients' })).toBeVisible();
-    await page.getByPlaceholder('Search').fill('cypress');
+    await page.getByPlaceholder('Search').fill('playwright');
     await page.getByLabel('Onboarding Status').selectOption('In Progress');
     await page.getByRole('button', { name: 'Search' }).click();
-    await expect(page.getByText('Cypress5263', { exact: true })).toBeVisible();
+    await expect(page.locator('td:nth-child(2)').first()).toBeVisible();
   });
 
   test('Visit Client Page and Create a Class Balance Account Holder (Organization Type)', async ({ page }) => {
@@ -32,6 +32,53 @@ test('Login', async ({ page }) => {
     await page.fill('input[type="password"]', 'endava1!');
     await page.getByRole('button', { name: 'Sign in' }).click();
 
+    //Create a Class Balance Account Holder (Organization Type)
     await page.getByText('Clients').click();
     await expect(page.getByRole('heading', { name: 'Clients' })).toBeVisible();
+    await page.getByRole('button', { name: 'Create New Client' }).click();
+    await page.locator('div.cursor-pointer:nth-child(2)').click();
+    await expect(page.getByRole('heading', { name: 'Create New Client' })).toBeVisible();
+    await page.getByLabel('Edition').selectOption('Class');
+    const randomNumber = Math.floor(Math.random() * 10000)
+    await page.getByPlaceholder('Jackrabbit Id').fill(`Playwright${randomNumber}`);
+    await page.getByLabel('Legal Entity Type').selectOption('Organization');
+    await page.getByLabel('Country').selectOption('United States');
+    // Wait for 2 seconds
+    //await page.waitForTimeout(2000);
+    await page.getByLabel('Timezone').selectOption('Mountain Standard Time');
+    await page.getByLabel('Legal Name').fill(`Playwright${randomNumber}`);
+    await page.getByText('Balance Platform').selectOption('JackrabbitTechnologies_BalancePlatform_TEST');
+    await page.getByLabel('Organization Type').selectOption('Association Incorporated');
+    await page.getByPlaceholder('First Name').fill('Playwright');
+    await page.getByPlaceholder('Last Name').fill('Rodriguez');
+    await page.getByPlaceholder('Email').fill('sebastiandario.rodriguez@endava.com');
+    await page.getByPlaceholder('Phone').fill('9108213456');
+    await page.getByPlaceholder('Address 1').fill('1234 Test St');
+    await page.getByPlaceholder('Address 2').fill('12th floor');
+    await page.getByPlaceholder('City').fill('Denver');
+    await page.getByLabel('State/Province').selectOption('North Carolina');
+    await page.getByPlaceholder('Postal Code').fill('28202');
+    await page.getByText('Create New ClientAccount').click();
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
+
+    //Invite a User
+    await expect(page.getByTestId('success-icon')).toBeVisible();
+    await expect(page.getByText('Account holder has been')).toBeVisible();
+    await expect(page.getByText('Please invite the user to')).toBeVisible();
+    await page.getByText('User email', { exact: true }).fill(`sebastiandario.rodriguez+${randomNumber}@endava.com`);
+    await page.getByPlaceholder('Confirm user email').fill(`sebastiandario.rodriguez+${randomNumber}@endava.com`);
+    await page.getByText('Create New ClientAccount').click();
+    // Wait for 5 seconds
+    //await page.waitForTimeout(5000);
+    await page.getByRole('button', { name: 'Invite'}).click();
+
+    //Sing Up
+    await expect(page.getByText('Sign Up')).toBeVisible();
+    await page.getByLabel('Role').selectOption('Owner');
+    await page.getByText('Sign UpEmail AddressFirst').click();
+    await page.getByRole('button', { name: 'Invite'}).click();
+    await expect(page.getByTestId('success-icon')).toBeVisible();
+    await expect(page.getByText('To complete the onboarding')).toBeVisible();
+    await page.getByRole('button', { name: 'Close' }).click();
+
   });
